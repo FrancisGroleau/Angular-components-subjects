@@ -6,12 +6,14 @@ import { AppComponent } from './app.component';
 import { Comp1Component } from './Components/comp1.component';
 import { Comp2Component } from './Components/comp2.component';
 import { Comp3Component } from './Components/comp3.component';
-import { PageService } from './Services/PageService';
+import { PageManager } from './Services/PageManager';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
-  imports:      [ BrowserModule, FormsModule ],
+  imports:      [ BrowserModule, FormsModule, CommonModule ],
   declarations: [ AppComponent, Comp1Component, Comp2Component, Comp3Component ],
   bootstrap:    [ AppComponent ],
-  providers: [ PageService ]
+  providers: [ PageManager ],
+  entryComponents: [ Comp1Component, Comp2Component, Comp3Component]
 })
 export class AppModule { }

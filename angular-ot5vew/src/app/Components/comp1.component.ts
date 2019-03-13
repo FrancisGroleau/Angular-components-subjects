@@ -1,5 +1,10 @@
 import { Component, AfterViewInit } from '@angular/core';
-import { PageService } from '../Services/PageService';
+import { PageManager, InputOutputKey } from '../Services/PageManager';
+import { IWidget } from '../Interfaces/IWidget';
+import { IWidgetConfig, DataTypeEnum, InputActionTypeEnum } from '../WidgetConfigs/widget-config';
+import { IWidgetUserConfig } from '../WidgetConfigs/widget-user-config';
+import { WidgetComp1Config } from './comp1.widgetconfig';
+
 
 @Component({
   selector: 'comp1',
@@ -7,46 +12,46 @@ import { PageService } from '../Services/PageService';
   styleUrls: [ ]
 })
 
-export class Comp1Component implements AfterViewInit {
-  name = 'Angular';
+export class Comp1Component implements AfterViewInit, IWidget {
+
+  pageManager: PageManager;
+  widgetConfig: IWidgetConfig;
+  userConfig: IWidgetUserConfig;
+  guid: string;
+
   _counter = 0;
 
-  _inputs = [];
 
-  constructor(private _pageService: PageService)
+  constructor(pageManager: PageManager)
   {
-    this._pageService.onAllWidgetLoaded().subscribe(() => { this.allWidgetLoaded() });
-    this._inputs = _pageService.getComponentInputs('Comp1Component');
+    this.pageManager = pageManager;
+
+    this.pageManager.onAllWidgetLoaded().subscribe(() => this.allWidgetLoaded());
+
+    this.widgetConfig = new WidgetComp1Config();
   }  
-
-  getInputs()
-  {
-    return this._inputs;
-  }
 
   allWidgetLoaded()
   {
 
-    var length = this._inputs.length;
-    for (var i = 0; i < length; i++) {
+    for (var i = 0; i < this.userConfig.inputs.length; i++) {
 
-      var currentInput = this._inputs[i];
-      var subject = this._pageService.getSubject(currentInput.Source, currentInput.Event);
+      var currentInput = this.userConfig.inputs[i];
+      let inputOut = new InputOutputKey(currentInput.sourceGuid, currentInput.dataField, currentInput.inputActionType ); 
+      var subject = this.pageManager.getSubject(inputOut);
 
-      if(currentInput.Event == 'Click')
+      if(currentInput.dataField == 'None' && currentInput.dataType == DataTypeEnum.Void && currentInput.inputActionType == InputActionTypeEnum.Refresh)
       {
-        subject.asObservable().subscribe(() => { this.ClickCallBack() });
-      }
-      
+        subject.asObservable().subscribe(() => this.clickCallBack());
+      } 
     }
   }
 
   ngAfterViewInit() {
-    this._pageService.widgetLoaded('Comp1Component');
+    this.pageManager.widgetLoaded(this.guid);
   }
 
-  ClickCallBack()
-  {
+  clickCallBack(){
     this._counter++;
   }
 

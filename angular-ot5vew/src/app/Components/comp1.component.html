@@ -1,7 +1,13 @@
 
 <div style="border: 1px solid black; padding: 10px;">
-<h4>Component 1</h4>
+<h3>Component 1</h3>
+<h4>Guid: {{guid}}</h4>
 <p>
   Number of time the button was clicked on Component2 : {{_counter}}
 </p>
+<br />
+<hr>
+Inputs : 
+<br />
+<li *ngFor="let i of inputs">{{i | json}}</li>
 </div>

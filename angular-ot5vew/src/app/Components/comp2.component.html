@@ -1,4 +1,10 @@
 <div style="border: 1px solid black; padding: 10px;">
-  <h4>Component 2</h4>
-  <input type="button" name="button" value="click" (click)="click()"/>
+  <h3>Component 2</h3>
+  <h4>Guid: {{guid}}</h4>
+  <input type="button" name="button" value="click" (click)="click()" />
+  <br />
+  <hr>
+  Inputs :
+  <br />
+  <li *ngFor="let i of userConfig.inputs">{{i | json}}</li>
 </div>

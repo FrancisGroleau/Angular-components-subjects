@@ -1,5 +1,8 @@
 import { Component, AfterViewInit } from '@angular/core';
-import { PageService } from '../Services/PageService';
+import { PageManager, InputOutputKey } from '../Services/PageManager';
+import { IWidgetConfig, DataTypeEnum, InputActionTypeEnum } from '../WidgetConfigs/widget-config';
+import { IWidgetUserConfig } from '../WidgetConfigs/widget-user-config';
+import { WidgetComp2Config } from './comp2.widgetconfig';
 
 @Component({
   selector: 'comp3',
@@ -8,46 +11,43 @@ import { PageService } from '../Services/PageService';
 })
 
 export class Comp3Component implements AfterViewInit {
+  
+  pageManager: PageManager;
+  widgetConfig: IWidgetConfig;
+  userConfig: IWidgetUserConfig;
+  guid: string;
+
   _counter = 0;
-
-  _inputs = [];
-
-  constructor(private _pageService: PageService)
+  
+  constructor(pageManager: PageManager)
   {
+    this.pageManager = pageManager;
 
-    this._pageService.onAllWidgetLoaded().subscribe(() =>{ this.allWidgetLoaded() });
-    this._inputs = _pageService.getComponentInputs('Comp3Component');
+    this.pageManager.onAllWidgetLoaded().subscribe(() => this.allWidgetLoaded());
 
+    this.widgetConfig = new WidgetComp2Config();
   }  
 
-  getInputs()
-  {
-    return this._inputs;
-  }
+  allWidgetLoaded(){
 
-  allWidgetLoaded()
-  {
+    for (var i = 0; i < this.userConfig.inputs.length; i++) {
 
-    var length = this._inputs.length;
-    for (var i = 0; i < length; i++) {
+      var currentInput = this.userConfig.inputs[i];
+      let inputOut = new InputOutputKey(currentInput.sourceGuid, currentInput.dataField, currentInput.inputActionType); 
+      var subject = this.pageManager.getSubject(inputOut);
 
-      var currentInput = this._inputs[i];
-      var subject = this._pageService.getSubject(currentInput.Source, currentInput.Event);
-
-      if(currentInput.Event == 'Click')
+      if(currentInput.dataField == 'None' && currentInput.dataType == DataTypeEnum.Void && currentInput.inputActionType == InputActionTypeEnum.Refresh)
       {
-        subject.asObservable().subscribe(() => { this.ClickCallBack() });
-      }
-      
+        subject.asObservable().subscribe(() => this.clickCallBack());
+      } 
     }
   }
 
   ngAfterViewInit() {
-    this._pageService.widgetLoaded('Comp3Component');
+    this.pageManager.widgetLoaded(this.guid);
   }
 
-  ClickCallBack()
-  {
+  clickCallBack(){
     this._counter++;
   }
 
